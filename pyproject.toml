@@ -16,4 +16,5 @@ dependencies = [
 e2b = ["e2b_code_interpreter"]
 
 [tool.setuptools.packages.find]
+where = ["src"]
 include = ["ags_tool*"]
