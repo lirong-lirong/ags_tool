@@ -12,7 +12,7 @@ AGS Tool is a Python abstraction layer for Tencent Cloud AGS (Agent Sandbox Serv
 
 ### Core Components
 
-**ags_tool.py** (~720 lines, 27KB)
+**ags_tool/ags_tool.py** (~826 lines)
 - `AGSConfig`: Pydantic model for configuration with environment variable support and auto domain/region matching
 - `AGSRuntime`: Main abstraction class providing all AGS operations
   - Tool lifecycle: `create_tool()`, `list_tools()`, `delete_tool()`
@@ -22,20 +22,20 @@ AGS Tool is a Python abstraction layer for Tencent Cloud AGS (Agent Sandbox Serv
 
 ### Critical Design Patterns
 
-1. **Domain Auto-Configuration** (ags_tool.py:92-95)
+1. **Domain Auto-Configuration** (ags_tool/ags_tool.py:92-95)
    - `validate_credentials()` model validator auto-sets domain from region to prevent 401 authentication errors
    - Pattern: `domain = f"{region}.tencentags.com"`
 
-2. **Runtime Storage Mount Override** (ags_tool.py:260-296)
+2. **Runtime Storage Mount Override** (ags_tool/ags_tool.py:260-296)
    - `create_tool()` accepts `storage_mounts` parameter to override config-based mounts at runtime
    - Enables flexible envd mounting with custom SubPath (e.g., `/usr/bin/envd`)
 
-3. **Code-Interpreter Type Checking** (ags_tool.py:654-733)
+3. **Code-Interpreter Type Checking** (ags_tool/ags_tool.py:654-733)
    - `execute_code_in_sandbox()` checks `hasattr(sandbox, 'run_code')` before execution
    - Only code-interpreter-v1 sandboxes support direct code execution
    - Other sandbox types must use file upload + command execution pattern
 
-4. **E2B Domain Force Override** (ags_tool.py:590-592)
+4. **E2B Domain Force Override** (ags_tool/ags_tool.py:590-592)
    - Always force-sets `os.environ["E2B_DOMAIN"]` to ensure region/domain consistency
    - Critical for preventing cached environment variable issues
 
@@ -44,8 +44,10 @@ AGS Tool is a Python abstraction layer for Tencent Cloud AGS (Agent Sandbox Serv
 ### Running Jupyter Notebooks
 
 ```bash
-# Install dependencies
-pip install jupyter tencentcloud-sdk-python>=3.1.32 e2b_code_interpreter pydantic
+# Install package with E2B support
+cd ags-tool
+pip install -e ".[e2b]"
+pip install jupyter
 
 # Set credentials
 export TENCENTCLOUD_SECRET_ID="your_id"
@@ -55,15 +57,13 @@ export E2B_API_KEY="your_e2b_key"
 # Start Jupyter
 jupyter notebook
 
-# Open swe_bench_ags_tool.ipynb or swe_bench_demo.ipynb
+# Open example/swe_bench_ags_tool.ipynb or example/swe_bench_demo.ipynb
 ```
 
 ### Importing ags_tool
 
-Since v1.2, the module uses Python-standard naming:
-
 ```python
-# Simple import (recommended)
+# After pip install -e .
 from ags_tool import AGSRuntime
 
 # Initialize with auto domain configuration
@@ -133,16 +133,15 @@ os.unlink(temp_path)
 
 ### Module Caching in Jupyter
 
-If ags_tool.py is modified, Jupyter notebooks require kernel restart to load changes:
+If ags_tool/ags_tool.py is modified, Jupyter notebooks require kernel restart to load changes:
 - Click "Kernel" → "Restart Kernel"
 - Or use: `%load_ext autoreload` + `%autoreload 2`
 
 ## Documentation Files
 
 - **README.md**: Complete API reference and usage examples
-- **QUICKSTART.md**: Quick start guide with minimal examples
-- **swe_bench_ags_tool.ipynb**: Example notebook using ags_tool abstraction
-- **swe_bench_demo.ipynb**: Original example using SDK directly
+- **example/swe_bench_ags_tool.ipynb**: Example notebook using ags_tool abstraction
+- **example/swe_bench_demo.ipynb**: Original example using SDK directly
 
 ## Common Error Patterns
 
@@ -181,6 +180,7 @@ print(f"E2B_API_KEY: {os.getenv('E2B_API_KEY')[:10]}...")
 
 ## Version History
 
+- **v1.3** (2026-02-10): Converted to installable Python package (`pip install -e .`), merged QUICKSTART.md into README.md
 - **v1.2** (2026-02-05): Code-interpreter type checking + file rename to ags_tool.py
 - **v1.1.1** (2026-02-05): E2B domain auto-configuration fix
 - **v1.1**: E2B integration + storage_mounts parameter + upload_file_to_sandbox()

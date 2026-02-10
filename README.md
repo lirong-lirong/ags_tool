@@ -28,14 +28,15 @@
 - ✅ 文件系统操作
 - ✅ 流式输出支持
 
-## 安装依赖
+## 安装
 
 ```bash
-# 基础依赖
-pip install tencentcloud-sdk-python>=3.1.32 pydantic
+# 开发模式安装（推荐）
+cd ags-tool
+pip install -e .
 
-# E2B 集成依赖（可选）
-pip install e2b_code_interpreter
+# 包含 E2B 集成
+pip install -e ".[e2b]"
 ```
 
 ## 快速开始
