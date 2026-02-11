@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ags-tool"
-version = "1.2.0"
+version = "1.4.0"
 description = "Python abstraction layer for Tencent Cloud AGS (Agent Sandbox Service)"
 requires-python = ">=3.9"
 dependencies = [

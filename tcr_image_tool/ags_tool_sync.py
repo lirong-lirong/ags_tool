@@ -30,27 +30,11 @@ import sys
 from dataclasses import dataclass
 from typing import Optional
 
-AGS_TOOL_DIR = os.getenv(
-    "AGS_TOOL_DIR",
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ags-tool")),
-)
-if AGS_TOOL_DIR not in sys.path:
-    sys.path.insert(0, AGS_TOOL_DIR)
-
 try:
     from ags_tool import AGSRuntime
 except ImportError:
-    module_path = os.getenv("AGS_TOOL_PATH", os.path.join(AGS_TOOL_DIR, "ags_tool.py"))
-    if os.path.isfile(module_path):
-        spec = importlib.util.spec_from_file_location("ags_tool", module_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        AGSRuntime = module.AGSRuntime
-    else:
-        print(
-            "Error: ags_tool module required. Set AGS_TOOL_DIR or AGS_TOOL_PATH to locate ags_tool.py."
-        )
-        sys.exit(1)
+    print("Error: ags_tool module required.")
+    sys.exit(1)
 
 try:
     from datasets import load_dataset

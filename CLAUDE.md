@@ -12,7 +12,7 @@ AGS Tool is a Python abstraction layer for Tencent Cloud AGS (Agent Sandbox Serv
 
 ### Core Components
 
-**ags_tool/ags_tool.py** (~826 lines)
+**src/ags_tool/ags_tool.py** (~826 lines)
 - `AGSConfig`: Pydantic model for configuration with environment variable support and auto domain/region matching
 - `AGSRuntime`: Main abstraction class providing all AGS operations
   - Tool lifecycle: `create_tool()`, `list_tools()`, `delete_tool()`
@@ -22,20 +22,20 @@ AGS Tool is a Python abstraction layer for Tencent Cloud AGS (Agent Sandbox Serv
 
 ### Critical Design Patterns
 
-1. **Domain Auto-Configuration** (ags_tool/ags_tool.py:92-95)
+1. **Domain Auto-Configuration** (src/ags_tool/ags_tool.py:92-95)
    - `validate_credentials()` model validator auto-sets domain from region to prevent 401 authentication errors
    - Pattern: `domain = f"{region}.tencentags.com"`
 
-2. **Runtime Storage Mount Override** (ags_tool/ags_tool.py:260-296)
+2. **Runtime Storage Mount Override** (src/ags_tool/ags_tool.py:260-296)
    - `create_tool()` accepts `storage_mounts` parameter to override config-based mounts at runtime
    - Enables flexible envd mounting with custom SubPath (e.g., `/usr/bin/envd`)
 
-3. **Code-Interpreter Type Checking** (ags_tool/ags_tool.py:654-733)
+3. **Code-Interpreter Type Checking** (src/ags_tool/ags_tool.py:654-733)
    - `execute_code_in_sandbox()` checks `hasattr(sandbox, 'run_code')` before execution
    - Only code-interpreter-v1 sandboxes support direct code execution
    - Other sandbox types must use file upload + command execution pattern
 
-4. **E2B Domain Force Override** (ags_tool/ags_tool.py:590-592)
+4. **E2B Domain Force Override** (src/ags_tool/ags_tool.py:590-592)
    - Always force-sets `os.environ["E2B_DOMAIN"]` to ensure region/domain consistency
    - Critical for preventing cached environment variable issues
 
@@ -133,7 +133,7 @@ os.unlink(temp_path)
 
 ### Module Caching in Jupyter
 
-If ags_tool/ags_tool.py is modified, Jupyter notebooks require kernel restart to load changes:
+If src/ags_tool/ags_tool.py is modified, Jupyter notebooks require kernel restart to load changes:
 - Click "Kernel" → "Restart Kernel"
 - Or use: `%load_ext autoreload` + `%autoreload 2`
 
@@ -180,6 +180,7 @@ print(f"E2B_API_KEY: {os.getenv('E2B_API_KEY')[:10]}...")
 
 ## Version History
 
+- **v1.4** (2026-02-10): Migrated to src layout (`src/ags_tool/`) to prevent Python namespace package shadowing when the clone directory is named `ags_tool`
 - **v1.3** (2026-02-10): Converted to installable Python package (`pip install -e .`), merged QUICKSTART.md into README.md
 - **v1.2** (2026-02-05): Code-interpreter type checking + file rename to ags_tool.py
 - **v1.1.1** (2026-02-05): E2B domain auto-configuration fix
